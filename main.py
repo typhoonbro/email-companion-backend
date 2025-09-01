@@ -15,11 +15,9 @@ app = FastAPI()
 
 # Configuração do CORS para permitir requisições do frontend
 origins = [
-    "http://localhost:5173",
-    "http://localhost:3000",
-    "http://localhost",
-    "http://localhost:4173",
-    "https://teste-auto-u-frontend-ytv8.vercel.app"
+    "http://localhost:5173", # Porta padrão do Vite pra desenvolvimento
+    "http://localhost:4173", # Porta padrão do Vite pra testar a versão de produção localmente
+    "https://teste-auto-u-frontend-ytv8.vercel.app" # URL do frontend hospedado no Vercel TROCAR PARA SUA URL
 ]
 
 app.add_middleware(
