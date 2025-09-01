@@ -1,6 +1,6 @@
-# Teste AutoU Backend 🧪
+# Email Companion Backend 🧪
 
-Backend for the **AutoU test**, built with **Python**.  
+Backend for the Email Companion (https://github.com/typhoonbro/email-companion-frontend), built with **Python**.  
 A simple **FastAPI REST API** serving endpoints for the frontend prototype.
 
 ---
