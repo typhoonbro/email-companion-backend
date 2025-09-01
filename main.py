@@ -19,7 +19,7 @@ origins = [
     "http://localhost:3000",
     "http://localhost",
     "http://localhost:4173",
-    "https://teste-auto-u-frontend-ytv8.vercel.app/"
+    "https://teste-auto-u-frontend-ytv8.vercel.app"
 ]
 
 app.add_middleware(
