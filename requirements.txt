@@ -1,9 +1,8 @@
 fastapi
 uvicorn[standard]
 python-dotenv
-requests
-spacy
 python-multipart
 pypdf
-langchain-community
+langchain
+langchain-core
 langchain-huggingface

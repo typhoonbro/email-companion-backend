@@ -1,43 +1,64 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Optional
-import uvicorn
 from dotenv import load_dotenv
+import asyncio
+import os
 
-load_dotenv() # Carrega as variáveis do .env
+# Importa os modelos e serviços
+from models import EmailProcessResponse
+from services import classify_email, generate_response, extract_text_from_pdf
 
-from .models import EmailProcessResponse
-from . import services
+# Carrega as variáveis de ambiente do arquivo .env
+load_dotenv()
 
-app = FastAPI(title="Email Classifier API")
+app = FastAPI()
 
 # Configuração do CORS para permitir requisições do frontend
+origins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost",
+    "http://localhost:5173/"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"], # Endereço do seu frontend React
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    
 )
 
 @app.post("/process-email/", response_model=EmailProcessResponse)
-async def process_email(
-    text: Optional[str] = Form(None),
-    file: Optional[UploadFile] = File(None)
+async def process_email_endpoint(
+    email_text: str = Form(""),
+    file: UploadFile | None = File(None)
 ):
-    if not text and not file:
-        raise HTTPException(status_code=400, detail="No text or file provided.")
+    """
+    Processa um email (texto ou PDF), classifica-o e gera uma resposta.
+    """
+    final_text = email_text
 
-    email_content = ""
     if file:
-        email_content = await services.get_text_from_file(file)
-    elif text:
-        email_content = text
+        if file.content_type == 'application/pdf':
+            pdf_content = await file.read()
+            final_text += "\n\n" + extract_text_from_pdf(pdf_content)
+        else:
+            raise HTTPException(status_code=400, detail="Tipo de arquivo inválido. Apenas PDFs são aceitos.")
 
-    if not email_content.strip():
-        raise HTTPException(status_code=400, detail="Email content is empty.")
+    if not final_text.strip():
+        raise HTTPException(status_code=400, detail="Nenhum texto de email fornecido.")
 
-    category = services.classify_email(email_content)
-    suggested_response = services.generate_response(email_content, category)
+   
+    # Executa as funções síncronas e bloqueantes em um thread separado
+    category = await asyncio.to_thread(classify_email, final_text)
+    suggested_response = await asyncio.to_thread(generate_response, final_text, category)
 
     return EmailProcessResponse(category=category, suggested_response=suggested_response)
+
+    
+
+@app.get("/")
+def read_root():
+    return {"message": "API do Classificador de Email está no ar!"}
