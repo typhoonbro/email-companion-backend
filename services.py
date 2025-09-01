@@ -28,8 +28,14 @@ def classify_email(email_text: str, file_content: str) -> str:
     """Classifica o email como Produtivo ou Improdutivo usando um prompt."""
     classification_prompt = PromptTemplate.from_template(
         """
+        Você é um assistente de redação de e-mails da minha empresa, do ramo financeiro. Voce sera um assistente para analistas que irão efetivamente responder solicitações feitas por email para a minha empresa. Sua única tarefa é ajudar a classificar e-mails recebidos em duas categorias: "Produtivo" ou "Improdutivo". Esses emails podem ser mensagens solicitando um status atual sobre uma requisição em andamento, compartilhando algum arquivo ou até mesmo mensagens improdutivas, como desejo de feliz natal ou perguntas não relevantes. 
+
+        Nosso objetivo é automatizar a leitura e classificação desses emails e sugerir classificações e respostas automáticas de acordo com o teor de cada email recebido, liberando tempo da equipe para que não seja mais necessário ter uma pessoa fazendo esse trabalho manualmente.
+
+        Perguntas simples como "você pode me ajudar?" ou "você pode me enviar o arquivo?" são consideradas improdutivas, pois não fornecem contexto suficiente para uma ação direta. Emails que incluem detalhes específicos, como números de requisição, datas ou solicitações claras, são considerados produtivos.
 
         Classifique o seguinte texto de email como "Produtivo" ou "Improdutivo".
+
         Email: "{text}"
         Conteúdo do PDF anexado (se houver): "{file_content}"
         Responda apenas uma única palavra com a classificação. Não forneça explicações adicionais ou a linha de raciocínio, apenas a classificação.
@@ -69,7 +75,7 @@ def classify_email(email_text: str, file_content: str) -> str:
 def generate_response(email_text: str, category: str, file_content: str) -> str:
     """Gera uma resposta sugerida com base na categoria."""
     template = """
-    Você é um assistente de redação de e-mails da minha empresa. Voce sera um assistente para analistas que irão efetivamente responder solicitações feitas por email para a minha empresa. Sua única tarefa é escrever uma resposta breve e profissional para o e-mail fornecido, com base na categoria. Lembre-se de que você está respondendo em nome de uma empresa, então mantenha um tom formal e profissional. 
+    Você é um assistente de redação de e-mails da minha empresa, da ramo fananceiro. Voce sera um assistente para analistas que irão efetivamente responder solicitações feitas por email para a minha empresa. Sua única tarefa é escrever uma resposta breve e profissional para o e-mail fornecido, com base na categoria. Lembre-se de que você está respondendo em nome de uma empresa, então mantenha um tom formal e profissional. 
 
     Considerando que somos uma empresa que realiza negócios online, é crucial que nossas respostas sejam claras, concisas e transmitam profissionalismo. Não devemos incluir informações pessoais ou informais. Mas devemos considerar o contato de possíveis clientes e parceiros, então a resposta deve ser acolhedora e convidativa. 
 
