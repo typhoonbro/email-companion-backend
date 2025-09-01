@@ -39,21 +39,22 @@ async def process_email_endpoint(
     Processa um email (texto ou PDF), classifica-o e gera uma resposta.
     """
     final_text = email_text
+    file_content = ""
 
+    
+    # Se houver um arquivo PDF, extrai o texto e o adiciona ao texto do email
     if file:
         if file.content_type == 'application/pdf':
             pdf_content = await file.read()
-            final_text += "\n\n" + extract_text_from_pdf(pdf_content)
+            file_content = "\n\nTexto contido no PDF anexado:" + extract_text_from_pdf(pdf_content)
         else:
             raise HTTPException(status_code=400, detail="Tipo de arquivo inválido. Apenas PDFs são aceitos.")
-
+    # Verifica se o corpo do email está vazio
     if not final_text.strip():
         raise HTTPException(status_code=400, detail="Nenhum texto de email fornecido.")
-
-   
     # Executa as funções síncronas e bloqueantes em um thread separado
-    category = await asyncio.to_thread(classify_email, final_text)
-    suggested_response = await asyncio.to_thread(generate_response, final_text, category)
+    category = await asyncio.to_thread(classify_email, final_text, file_content)
+    suggested_response = await asyncio.to_thread(generate_response, final_text, category, file_content)
 
     return EmailProcessResponse(category=category, suggested_response=suggested_response)
 
